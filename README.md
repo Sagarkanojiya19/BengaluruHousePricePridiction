@@ -11,6 +11,4 @@
 
 Create a new enviroment
 
----
-conda create -p venv python==3.7 -y
----
+<pre/>conda create -p venv python==3.7 -y</pre>
