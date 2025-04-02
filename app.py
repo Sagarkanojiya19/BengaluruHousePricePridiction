@@ -1,14 +1,14 @@
 import pickle
-from flask import Flask,request,app,jsonify,url_for,render_template
+import streamlit as st
+import pickle
+import numpy as np
+import pandas as pd
 from sklearn.preprocessing import StandardScaler, OneHotEncoder,FunctionTransformer
-import category_encoders as ce
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.compose import ColumnTransformer
 from sklearn.base import BaseEstimator, TransformerMixin
-import numpy as np
-import pandas as pd
 
 
 class LogTransformer(BaseEstimator, TransformerMixin):
@@ -21,34 +21,40 @@ class LogTransformer(BaseEstimator, TransformerMixin):
         return np.log1p(X) 
 
 
-app = Flask(__name__)
+
 
 regmodel = pickle.load(open('house_price_pipeline.pkl','rb'))
 
 
+# Load the trained model
+with open('house_price_pipeline.pkl', 'rb') as file:
+    model = pickle.load(file)
 
-@app.route('/')
-def home():
-    return render_template('home.html')
+# Title of the app
+st.title("Bengaluru House Price Prediction")
 
-@app.route('/predict_api',methods=['POST'])
-def predict_api():
-    data = request.json['data']
-    data = pd.DataFrame(data, index=[0])
-    prediction = regmodel.predict(data)
-    print(np.expm1(prediction[0]))
-    return jsonify(np.expm1(prediction[0]))
+# Input fields
+location = st.text_input("Location:")
+size = st.text_input("Size (e.g., 1 BHK, 2 BHK):")
+total_sqft = st.number_input("Total Square Feet:", min_value=300.0, max_value=10000.0, step=50.0)
+bath = st.number_input("Number of Bathrooms:", min_value=1, max_value=10, step=1)
 
-@app.route('/predict',methods=['POST'])
-def predict():
-    data = request.form.to_dict()
-    data['total_sqft'] = float(data['total_sqft'])
-    data['bath'] = int(data['bath'])
-    data = pd.DataFrame(data, index=[0])
-    print(data) 
-    prediction = regmodel.predict(data)
-    print(np.expm1(prediction[0]))
-    return render_template('home.html',prediction_text='House Price is {}'.format(np.expm1(prediction[0])))
+# Predict button
+if st.button("Predict Price"):
+    if location and size:
+        # Create input dataframe
+        input_data = pd.DataFrame({
+            'location': [location],
+            'size': [size],
+            'total_sqft': [total_sqft],
+            'bath': [bath]
+        })
 
-if(__name__=='__main__'):
-    app.run(debug=True)
+        # Predict
+        prediction = model.predict(input_data)
+        predicted_price = np.expm1(prediction[0])  # Reverse log transformation
+
+        # Display result
+        st.success(f"Estimated House Price: ₹{predicted_price:,.2f}")
+    else:
+        st.error("Please enter both location and size.")
