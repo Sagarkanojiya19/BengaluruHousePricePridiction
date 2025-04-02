@@ -40,5 +40,16 @@ def predict_api():
     print(np.expm1(prediction[0]))
     return jsonify(np.expm1(prediction[0]))
 
+@app.route('/predict',methods=['POST'])
+def predict():
+    data = request.form.to_dict()
+    data['total_sqft'] = float(data['total_sqft'])
+    data['bath'] = int(data['bath'])
+    data = pd.DataFrame(data, index=[0])
+    print(data) 
+    prediction = regmodel.predict(data)
+    print(np.expm1(prediction[0]))
+    return render_template('home.html',prediction_text='House Price is {}'.format(np.expm1(prediction[0])))
+
 if(__name__=='__main__'):
     app.run(debug=True)
