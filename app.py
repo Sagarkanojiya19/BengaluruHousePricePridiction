@@ -1,5 +1,4 @@
 import pickle
-from django.shortcuts import render
 from flask import Flask,request,app,jsonify,url_for,render_template
 from sklearn.preprocessing import StandardScaler, OneHotEncoder,FunctionTransformer
 import category_encoders as ce
