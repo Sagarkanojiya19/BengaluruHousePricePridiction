@@ -10,6 +10,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.compose import ColumnTransformer
 from sklearn.base import BaseEstimator, TransformerMixin
 
+import os
+os.system("pip install scikit-learn==1.6.1")
 
 class LogTransformer(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
@@ -55,6 +57,6 @@ if st.button("Predict Price"):
         predicted_price = np.expm1(prediction[0])  # Reverse log transformation
 
         # Display result
-        st.success(f"Estimated House Price: ₹{predicted_price:,.2f}")
+        st.success(f"Estimated House Price: ₹{predicted_price:,.2f}lakhs")
     else:
         st.error("Please enter both location and size.")
