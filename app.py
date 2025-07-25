@@ -1,6 +1,7 @@
+
 import pickle
 import streamlit as st
-import pickle
+import joblib
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, OneHotEncoder,FunctionTransformer
@@ -9,9 +10,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.compose import ColumnTransformer
 from sklearn.base import BaseEstimator, TransformerMixin
-
-import os
-os.system("pip install scikit-learn==1.6.1")
 
 class LogTransformer(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
@@ -22,15 +20,9 @@ class LogTransformer(BaseEstimator, TransformerMixin):
             return np.log1p(X.values).reshape(-1, 1)  # Fix reshape issue
         return np.log1p(X) 
 
-
-
-
-regmodel = pickle.load(open('house_price_pipeline.pkl','rb'))
-
-
 # Load the trained model
-with open('house_price_pipeline.pkl', 'rb') as file:
-    model = pickle.load(file)
+with open('model.pkl', 'rb') as file:
+    model = joblib.load(file)
 
 # Title of the app
 st.title("Bengaluru House Price Prediction")
